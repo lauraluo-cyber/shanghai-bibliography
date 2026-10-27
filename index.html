@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>上海研究文献检索</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,8 +40,6 @@ button,input,select,textarea{font:inherit;color:inherit}
 .eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-3);text-transform:uppercase}
 h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,5.4vw,44px);line-height:1.1;margin:0;letter-spacing:.04em}
 h1::after{content:"";display:inline-block;width:.2em;height:.2em;background:var(--accent);margin-left:.14em;vertical-align:.08em}
-.lede{margin:0;color:var(--ink-2);max-width:64ch}
-.lede b{color:var(--ink);font-weight:500;font-family:var(--f-mono)}
 
 nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:2px;border-bottom:1px solid var(--rule);margin-block:0 20px;overflow-x:auto;scrollbar-width:none}
 nav.tabs::-webkit-scrollbar{display:none}
@@ -49,25 +51,44 @@ nav.tabs::-webkit-scrollbar{display:none}
 .notice{border:1px solid var(--rule);background:var(--panel);padding:10px 14px;color:var(--ink-2);font-size:13.5px;margin-bottom:18px}
 .notice[data-kind="warn"]{border-left:3px solid var(--accent)}
 
-/* ---------- line map ---------- */
-.linemap{padding-block:6px 4px}
-.lm-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
-.lm-name{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:.06em}
-.lm-hint{font-size:12px;color:var(--ink-3)}
-.lm-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:4px}
-.lm-seg{appearance:none;background:none;border:0;padding:0 4px 2px;cursor:pointer;text-align:center;display:grid;justify-items:center;gap:2px;color:var(--ink)}
-.lm-bar{position:relative;display:block;width:100%;height:2px;background:var(--ink);margin:16px 0 10px}
-.lm-seg:first-child .lm-bar::before,.lm-bar::after{content:"";position:absolute;top:-5px;width:2px;height:12px;background:var(--ink)}
-.lm-seg:first-child .lm-bar::before{left:0}
-.lm-bar::after{right:0}
-.lm-dot{position:absolute;left:50%;top:50%;width:9px;height:9px;border-radius:50%;background:var(--bg);border:2px solid var(--ink);transform:translate(-50%,-50%)}
-.lm-seg:hover .lm-dot{border-color:var(--accent)}
-.lm-seg[aria-pressed="true"] .lm-bar{background:var(--accent);box-shadow:0 1px 0 var(--accent),0 -1px 0 var(--accent)}
-.lm-seg[aria-pressed="true"] .lm-dot{background:var(--accent);border-color:var(--accent)}
-.lm-place{font-weight:700;font-size:15px}
-.lm-seg[aria-pressed="true"] .lm-place{color:var(--accent)}
-.lm-sub{font-size:12px;color:var(--ink-3)}
-.lm-sub b{font-family:var(--f-mono);font-weight:500;color:var(--ink-2)}
+/* ---------- 研究区域 左栏 ---------- */
+.page{display:grid;grid-template-columns:184px minmax(0,1fr);gap:0 32px;align-items:start}
+.main{min-width:0}
+.rail{position:sticky;top:env(safe-area-inset-top,0px);padding:16px 0 8px;display:grid;gap:10px;align-content:start}
+.rail-head{display:grid;gap:2px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.rail-title{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:.06em}
+.rail-hint{font-size:12px;color:var(--ink-3)}
+.rg-all{appearance:none;border:1px solid var(--ink);background:var(--bg);padding:5px 10px;text-align:left;cursor:pointer;font-size:13.5px;color:var(--ink);display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-radius:2px}
+.rg-all:hover{border-color:var(--accent);color:var(--accent)}
+.rg-all[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.rg-all .n{font-family:var(--f-mono);font-size:11.5px;opacity:.8}
+.rail-track{position:relative;display:grid;margin-top:4px}
+.rail-track::before{content:"";position:absolute;left:5px;top:14px;bottom:14px;width:2px;background:var(--ink)}
+.rg{appearance:none;background:none;border:0;padding:7px 0 7px 22px;cursor:pointer;text-align:left;display:grid;gap:1px;color:var(--ink);position:relative;min-width:0}
+.rg-dot{position:absolute;left:0;top:11px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--ink)}
+.rg:hover .rg-dot{border-color:var(--accent)}
+.rg[aria-pressed="true"] .rg-dot{background:var(--accent);border-color:var(--accent)}
+.rg-place{font-weight:700;font-size:15px;line-height:1.3}
+.rg:hover .rg-place,.rg[aria-pressed="true"] .rg-place{color:var(--accent)}
+.rg-sub{font-size:12px;color:var(--ink-3);line-height:1.4}
+.rg-sub b{font-family:var(--f-mono);font-weight:500;color:var(--ink-2)}
+@media (max-width:860px){
+  .page{grid-template-columns:minmax(0,1fr)}
+  .rail{position:static;padding:12px 0 10px;border-bottom:1px solid var(--rule);gap:8px}
+  .rail-head{border-bottom:0;padding-bottom:0}
+  .rail-hint{display:none}
+  #rail-body{display:flex;flex-wrap:wrap;gap:6px}
+  .rg-all{padding:4px 12px;border-radius:999px;border-color:var(--rule);color:var(--ink-2)}
+  .rg-all[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .rail-track{display:contents}
+  .rail-track::before{display:none}
+  .rg{padding:4px 12px;border:1px solid var(--rule);border-radius:999px;display:flex;gap:6px;align-items:baseline;color:var(--ink-2)}
+  .rg-dot,.rg-seg{display:none}
+  .rg-place{font-size:13px;font-weight:500}
+  .rg-sub{font-size:11px}
+  .rg[aria-pressed="true"]{background:var(--ink);border-color:var(--ink)}
+  .rg[aria-pressed="true"] .rg-place,.rg[aria-pressed="true"] .rg-sub,.rg[aria-pressed="true"] .rg-sub b{color:var(--bg)}
+}
 
 /* ---------- chips ---------- */
 .controls{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-block:14px 6px}
@@ -228,11 +249,16 @@ details.mobile-filters{display:none}
   <header class="masthead">
     <div class="eyebrow">慧超的史料库</div>
     <h1>上海研究文献检索</h1>
-    <p class="lede" id="lede">海外博士论文与专著 <b id="n-os">—</b> 条，中文相关研究 <b id="n-cn">—</b> 条；其中 <b id="n-cur">—</b> 条按论文章节标注为与本研究高度相关。</p>
   </header>
 
+  <div class="page">
+  <aside class="rail" id="rail" aria-label="研究区域">
+    <div class="rail-head"><span class="rail-title">研究区域</span><span class="rail-hint">肇嘉浜沿线，自西向东</span></div>
+    <div id="rail-body"></div>
+  </aside>
+  <main class="main">
   <nav class="tabs" role="tablist" aria-label="视图">
-    <button class="tab" role="tab" id="tab-map" data-view="map" aria-selected="true">研究地图</button>
+    <button class="tab" role="tab" id="tab-map" data-view="map" aria-selected="true">研究区域</button>
     <button class="tab" role="tab" id="tab-all" data-view="all" aria-selected="false">全部书目<span class="n" id="tn-all"></span></button>
     <button class="tab" role="tab" id="tab-arch" data-view="arch" aria-selected="false">档案与史料<span class="n" id="tn-arch"></span></button>
     <button class="tab" role="tab" id="tab-time" data-view="time" aria-selected="false">大事年表<span class="n" id="tn-time"></span></button>
@@ -243,17 +269,8 @@ details.mobile-filters{display:none}
 
   <div id="db-notice" class="notice" hidden></div>
 
-  <!-- ================= 研究地图 ================= -->
+  <!-- ================= 研究区域 ================= -->
   <section id="view-map" role="tabpanel" aria-labelledby="tab-map">
-    <div class="linemap" role="group" aria-label="肇嘉浜三段">
-      <div class="lm-head"><span class="lm-name">肇嘉浜</span><span class="lm-hint">示意，西段在左，东段在右。点选一段，查看对应章节。</span></div>
-      <div class="lm-track">
-        <button class="lm-seg" data-ch="第6章" aria-pressed="false"><span class="lm-bar"><span class="lm-dot"></span></span><span class="lm-place">徐家汇</span><span class="lm-sub">西段 · 第6章 · <b id="lmn-第6章">0</b> 条</span></button>
-        <button class="lm-seg" data-ch="第5章" aria-pressed="false"><span class="lm-bar"><span class="lm-dot"></span></span><span class="lm-place">打浦桥</span><span class="lm-sub">中段 · 第5章 · <b id="lmn-第5章">0</b> 条</span></button>
-        <button class="lm-seg" data-ch="第4章" aria-pressed="false"><span class="lm-bar"><span class="lm-dot"></span></span><span class="lm-place">老西门</span><span class="lm-sub">东段 · 第4章 · <b id="lmn-第4章">0</b> 条</span></button>
-      </div>
-    </div>
-
     <div class="controls" id="chapter-chips" role="group" aria-label="按章节"></div>
     <div class="controls" id="origin-chips" role="group" aria-label="按来源"></div>
     <div class="controls" id="tier-chips" role="group" aria-label="按相关度"></div>
@@ -358,6 +375,8 @@ details.mobile-filters{display:none}
       <p>海外部分的 Excel 版、Zotero 导入文件和六份分国别检索报告，在 PhD Thesis 文件夹的 <code>海外上海史书目</code> 目录中。</p>
     </div>
   </section>
+  </main>
+  </div>
 </div>
 <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
 
@@ -549,7 +568,7 @@ function flushNote(id, area){
   enqueue(id, () => writeReading(id, next)).then(() => flagSave(id, '已保存')).catch(() => flagSave(id, '未保存'));
 }
 
-/* ---------- 研究地图 ---------- */
+/* ---------- 研究区域 ---------- */
 let mapChapter = store.get('mapChapter', 'all');
 let mapTier = store.get('mapTier', 0);
 let mapOrigin = store.get('mapOrigin', 'all');
@@ -566,8 +585,6 @@ function renderMap(){
   const all = CURATED.filter(r => mapChapter === 'all' || r.r.ch.includes(mapChapter));
   chipRow('#origin-chips', '来源', [['all','全部', all.length], ['os','海外', all.filter(r => !isCN(r)).length], ['cn','中文', all.filter(isCN).length]], mapOrigin, v => { mapOrigin = v; store.set('mapOrigin', v); renderMap(); });
   chipRow('#tier-chips', '相关度', [[0,'全部'], [3,TIER[3]], [2,TIER[2]], [1,TIER[1]]].map(([v, name]) => [v, name, curatedIn(mapChapter).filter(r => !v || r.r.lv === v).length]), mapTier, v => { mapTier = v; store.set('mapTier', v); renderMap(); });
-  document.querySelectorAll('.lm-seg').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ch === mapChapter)));
-  renderSegMeta();
   const jump = $('#map-arch-jump');
   const nArch = ARCH.filter(a => mapChapter === 'all' || (a.chapters || []).includes(mapChapter)).length;
   jump.hidden = !nArch;
@@ -583,8 +600,49 @@ function renderMap(){
     const l = el('div', {class:'list'}); part.forEach(r => l.append(card(r))); box.append(l);
   });
   if (!list.length) box.append(el('div', {class:'empty', text:'这一组没有条目。'}));
+  renderRail();
 }
-function renderSegMeta(){ ['第4章','第5章','第6章'].forEach(ch => { const m = document.getElementById('lmn-' + ch); if (m) m.textContent = String(curatedIn(ch).length); }); }
+
+
+/* ---------- 研究区域（左栏，按区域筛选所有视图） ---------- */
+const REGIONS = [{ch:'第6章', place:'徐家汇', seg:'西段'}, {ch:'第5章', place:'打浦桥', seg:'中段'}, {ch:'第4章', place:'老西门', seg:'东段'}];
+const PLACE_CH = {'老西门':'第4章', '打浦桥':'第5章', '徐家汇':'第6章'};
+let region = store.get('region', 'all');
+function viewChapter(){
+  if (view === 'map') return mapChapter;
+  if (view === 'arch') return archCh;
+  if (view === 'time') return tCh !== 'all' ? tCh : (tPlace === 'all' ? 'all' : (PLACE_CH[tPlace] || null));
+  if (view === 'ex') return exCh;
+  if (view === 'all') return !F.rel ? 'all' : (F.rel.startsWith('ch:') ? F.rel.slice(3) : null);
+  return region;
+}
+function railCounts(){
+  const inCh = (list, c) => c === 'all' ? list.length : list.filter(x => (x.chapters || []).includes(c)).length;
+  if (view === 'arch') return ['条档案', c => inCh(ARCH, c)];
+  if (view === 'time') return ['个事件', c => inCh(EVENTS, c)];
+  if (view === 'ex') return ['条摘录', c => inCh([...excerpts.values()], c)];
+  if (view === 'map') return ['条文献', c => curatedIn(c).length];
+  return ['条文献', c => CURATED.filter(r => c === 'all' || r.r.ch.includes(c)).length];
+}
+function renderRail(){
+  const cur = viewChapter(), [unit, n] = railCounts();
+  const box = $('#rail-body'); box.replaceChildren();
+  box.append(el('button', {class:'rg-all', 'aria-pressed': String(cur === 'all'), onclick: () => pickRegion('all')}, '全部区域', el('span', {class:'n', text: `${n('all')} ${unit}`})));
+  const track = el('div', {class:'rail-track', role:'group', 'aria-label':'肇嘉浜三段'});
+  REGIONS.forEach(g => track.append(el('button', {class:'rg', 'aria-pressed': String(cur === g.ch), onclick: () => pickRegion(g.ch)},
+    el('span', {class:'rg-dot'}), el('span', {class:'rg-place', text: g.place}),
+    el('span', {class:'rg-sub'}, el('span', {class:'rg-seg', text: `${g.seg} · ${g.ch} · `}), el('b', {text: String(n(g.ch))}), ` ${unit}`))));
+  box.append(track);
+}
+function pickRegion(ch){
+  region = ch; store.set('region', ch);
+  mapChapter = ch; store.set('mapChapter', ch); mapTier = 0; store.set('mapTier', 0);
+  archCh = ch; store.set('archCh', ch);
+  tCh = ch; store.set('tCh', ch); tPlace = 'all'; store.set('tPlace', 'all');
+  exCh = ch; store.set('exCh', ch);
+  F.rel = ch === 'all' ? '' : 'ch:' + ch; store.set('filters2', F); shown = 60; syncFilters();
+  setView(view);
+}
 
 /* ---------- 全部书目 ---------- */
 const DEFAULT_F = {origin:'', kind:'', group:'', country:'', lang:'', decade:'', rel:'', status:'', zot:'', sort:'rel'};
@@ -655,6 +713,7 @@ function renderAll(){
   list.slice(0, shown).forEach(r => box.append(card(r)));
   if (!list.length) box.append(el('div', {class:'empty', text:'没有符合条件的条目，可以放宽筛选。'}));
   $('#more').hidden = list.length <= shown;
+  renderRail();
 }
 
 /* ---------- 档案与史料 ---------- */
@@ -738,6 +797,7 @@ function renderArch(){
     const l = el('div', {class:'list'}); part.forEach(a => l.append(archCard(a))); box.append(l);
   });
   if (!list.length) box.append(el('div', {class:'empty', text: ARCH.length ? '没有符合条件的条目，可以放宽筛选。' : '档案与史料索引尚未载入。'}));
+  renderRail();
 }
 function toArchCSV(list){
   const head = ['类别','名称','收藏或出版','编号或版本','年代','文种','内容','与本研究','对应章节','查阅方式','本地文件','证据表','状态','我的进度','笔记','链接','核实'];
@@ -782,6 +842,7 @@ function renderTime(){
     box.append(evItem(e));
   });
   if (!list.length) box.append(el('li', {class:'empty', text: EVENTS.length ? '没有符合条件的事件。' : '大事年表尚未载入。'}));
+  renderRail();
 }
 function evItem(e){
   const body = el('div', {class:'cr-body'},
@@ -846,6 +907,7 @@ function renderEx(){
     l.append(exCard(id, x));
   });
   if (!list.length) box.append(el('div', {class:'empty', text: excerpts.size ? '没有符合条件的摘录，可以放宽筛选。' : '还没有摘录。点"新增摘录"，或在任何文献、档案卡片上点"添加摘录"。'}));
+  renderRail();
 }
 function exCard(id, x){
   const s = srcLabel(x);
@@ -974,7 +1036,8 @@ function renderReading(){
   const section = (title, part) => { if (!part.length) return; any = true; part.sort((a,b) => ((b.r?b.r.lv:0) - (a.r?a.r.lv:0)) || ((a.y||9999) - (b.y||9999))); box.append(el('div', {class:'section-title'}, title, el('span', {class:'n', text: part.length + ' 条'}))); const l = el('div', {class:'list'}); part.forEach(r => l.append(card(r))); box.append(l); };
   ['在读','待读','已读','已引用'].forEach(g => section(g, [...reading.entries()].filter(([id, v]) => v.status === g && BY_ID.has(id)).map(([id]) => BY_ID.get(id))));
   section('只有笔记', [...reading.entries()].filter(([id, v]) => !v.status && (v.note||'').trim() && BY_ID.has(id)).map(([id]) => BY_ID.get(id)));
-  if (!any) box.append(el('div', {class:'empty', text:'还没有标记。在"研究地图"或"全部书目"里点"待读""在读""已读""已引用"，或写一条笔记，它们会出现在这里。'}));
+  if (!any) box.append(el('div', {class:'empty', text:'还没有标记。在"研究区域"或"全部书目"里点"待读""在读""已读""已引用"，或写一条笔记，它们会出现在这里。'}));
+  renderRail();
 }
 
 /* ---------- export ---------- */
@@ -1019,13 +1082,11 @@ function setView(v){
   if (at) { const l = at.offsetLeft, r = l + at.offsetWidth; if (l < nav.scrollLeft) nav.scrollLeft = l - 8; else if (r > nav.scrollLeft + nav.clientWidth) nav.scrollLeft = r - nav.clientWidth + 8; }
   const sec = document.getElementById('view-' + v);
   if (sec && nav) { const top = sec.getBoundingClientRect().top + window.scrollY - nav.offsetHeight - 8; if (window.scrollY > top) window.scrollTo(0, Math.max(0, top)); }
+  renderRail();
 }
 
 /* ---------- boot ---------- */
 const nCN = ITEMS.filter(isCN).length;
-$('#n-os').textContent = String(ITEMS.length - nCN);
-$('#n-cn').textContent = String(nCN);
-$('#n-cur').textContent = String(CURATED.length);
 $('#tn-all').textContent = String(ITEMS.length);
 $('#tn-arch').textContent = ARCH.length ? String(ARCH.length) : '';
 $('#tn-time').textContent = EVENTS.length ? String(EVENTS.length) : '';
@@ -1035,7 +1096,6 @@ $('#exp-ex').addEventListener('click', () => save('上海研究文献检索_摘�
 let aqTimer; $('#aq').addEventListener('input', e => { clearTimeout(aqTimer); aqTimer = setTimeout(() => { AQ = e.target.value; renderArch(); }, 180); });
 $('#exp-arch').addEventListener('click', () => save('上海研究文献检索_档案与史料.csv', toArchCSV(archFiltered())));
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => setView(t.dataset.view)));
-document.querySelectorAll('.lm-seg').forEach(b => b.addEventListener('click', () => { mapChapter = b.dataset.ch; store.set('mapChapter', mapChapter); mapTier = 0; store.set('mapTier', 0); renderMap(); }));
 buildFilters($('#filters-desktop'), '-d'); buildFilters($('#filters-mobile'), '-m');
 let qTimer; $('#q').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { Q = e.target.value; shown = 60; renderAll(); }, 180); });
 $('#more').addEventListener('click', () => { shown += 60; renderAll(); });
