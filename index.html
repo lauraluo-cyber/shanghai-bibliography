@@ -312,26 +312,16 @@ html[data-public="1"] #view-reading .stat-row,html[data-public="1"] #view-readin
   </aside>
   <main class="main">
   <nav class="tabs" role="tablist" aria-label="视图">
-    <button class="tab" role="tab" id="tab-map" data-view="map" aria-selected="true">研究区域</button>
+    <button class="tab" role="tab" id="tab-link" data-view="link" aria-selected="true">史料关联</button>
     <button class="tab" role="tab" id="tab-all" data-view="all" aria-selected="false">全部书目<span class="n" id="tn-all"></span></button>
     <button class="tab" role="tab" id="tab-arch" data-view="arch" aria-selected="false">档案与史料<span class="n" id="tn-arch"></span></button>
     <button class="tab" role="tab" id="tab-time" data-view="time" aria-selected="false">大事年表<span class="n" id="tn-time"></span></button>
-    <button class="tab" role="tab" id="tab-link" data-view="link" aria-selected="false">史料关联</button>
     <button class="tab" role="tab" id="tab-ex" data-view="ex" aria-selected="false">摘录库<span class="n" id="tn-ex"></span></button>
     <button class="tab" role="tab" id="tab-reading" data-view="reading" aria-selected="false">我的阅读<span class="n" id="tn-reading"></span></button>
     <button class="tab" role="tab" id="tab-about" data-view="about" aria-selected="false">关于</button>
   </nav>
 
   <div id="db-notice" class="notice" hidden></div>
-
-  <!-- ================= 研究区域 ================= -->
-  <section id="view-map" role="tabpanel" aria-labelledby="tab-map">
-    <div class="controls" id="chapter-chips" role="group" aria-label="按章节"></div>
-    <div class="controls" id="origin-chips" role="group" aria-label="按来源"></div>
-    <div class="controls" id="tier-chips" role="group" aria-label="按相关度"></div>
-    <button class="jump" id="map-arch-jump" hidden></button>
-    <div id="map-list"></div>
-  </section>
 
   <!-- ================= 全部书目 ================= -->
   <section id="view-all" role="tabpanel" aria-labelledby="tab-all" hidden>
@@ -635,39 +625,11 @@ function flushNote(id, area){
   enqueue(id, () => writeReading(id, next)).then(() => flagSave(id, '已保存')).catch(() => flagSave(id, '未保存'));
 }
 
-/* ---------- 研究区域 ---------- */
-let mapChapter = store.get('mapChapter', 'all');
-let mapTier = store.get('mapTier', 0);
-let mapOrigin = store.get('mapOrigin', 'all');
+/* ---------- 高度相关文献（供左栏与史料关联使用） ---------- */
 const CURATED = ITEMS.filter(r => r.r);
-const originOk = r => mapOrigin === 'all' || (mapOrigin === 'cn' ? isCN(r) : !isCN(r));
-function curatedIn(ch){ return CURATED.filter(r => (ch === 'all' || r.r.ch.includes(ch)) && originOk(r)); }
-function progress(list){ return list.filter(r => { const s = (reading.get(r.id)||{}).status; return s === '已读' || s === '已引用'; }).length; }
 function chipRow(boxId, label, opts, current, onPick){
   const box = $(boxId); box.replaceChildren(el('span', {class:'label', text: label}));
   opts.forEach(([v, name, n]) => box.append(el('button', {class:'chip', 'aria-pressed': String(current === v), onclick: () => onPick(v)}, name, n == null ? null : el('span', {class:'n', text: String(n)}))));
-}
-function renderMap(){
-  chipRow('#chapter-chips', '章节', [['all','全部章节', curatedIn('all').length], ...CHAPTERS.map(c => [c.k, c.name, curatedIn(c.k).length])], mapChapter, v => { mapChapter = v; store.set('mapChapter', v); renderMap(); });
-  const all = CURATED.filter(r => mapChapter === 'all' || r.r.ch.includes(mapChapter));
-  chipRow('#origin-chips', '来源', [['all','全部', all.length], ['os','海外', all.filter(r => !isCN(r)).length], ['cn','中文', all.filter(isCN).length]], mapOrigin, v => { mapOrigin = v; store.set('mapOrigin', v); renderMap(); });
-  chipRow('#tier-chips', '相关度', [[0,'全部'], [3,TIER[3]], [2,TIER[2]], [1,TIER[1]]].map(([v, name]) => [v, name, curatedIn(mapChapter).filter(r => !v || r.r.lv === v).length]), mapTier, v => { mapTier = v; store.set('mapTier', v); renderMap(); });
-  const jump = $('#map-arch-jump');
-  const nArch = ARCH.filter(a => mapChapter === 'all' || (a.chapters || []).includes(mapChapter)).length;
-  jump.hidden = !nArch;
-  jump.textContent = mapChapter === 'all' ? `查看全部档案与史料（${nArch} 条）` : `查看${CH_NAME[mapChapter]}相关的档案与史料（${nArch} 条）`;
-  jump.onclick = () => { archCh = mapChapter; store.set('archCh', archCh); archCat = 'all'; store.set('archCat', 'all'); setView('arch'); };
-  const box = $('#map-list'); box.replaceChildren();
-  const list = curatedIn(mapChapter).filter(r => !mapTier || r.r.lv === mapTier);
-  const head = mapChapter === 'all' ? '全部章节' : CH_NAME[mapChapter];
-  [3,2,1].forEach(lv => {
-    const part = list.filter(r => r.r.lv === lv).sort((a,b) => (isCN(a) - isCN(b)) || ((a.y||9999) - (b.y||9999)));
-    if (!part.length) return;
-    box.append(el('div', {class:'section-title'}, head, el('span', {class: lv === 3 ? 'acc' : '', text: TIER[lv]}), el('span', {class:'n', text: `${part.length} 条 · 已读 ${progress(part)}`})));
-    const l = el('div', {class:'list'}); part.forEach(r => l.append(card(r))); box.append(l);
-  });
-  if (!list.length) box.append(el('div', {class:'empty', text:'这一组没有条目。'}));
-  renderRail();
 }
 
 
@@ -676,7 +638,6 @@ const REGIONS = [{ch:'第6章', place:'徐家汇', seg:'西段'}, {ch:'第5章',
 const PLACE_CH = {'老西门':'第4章', '打浦桥':'第5章', '徐家汇':'第6章'};
 let region = store.get('region', 'all');
 function viewChapter(){
-  if (view === 'map') return mapChapter;
   if (view === 'arch') return archCh;
   if (view === 'time') return tCh !== 'all' ? tCh : (tPlace === 'all' ? 'all' : (PLACE_CH[tPlace] || null));
   if (view === 'ex') return exCh;
@@ -690,7 +651,6 @@ function railCounts(){
   if (view === 'time') return ['个事件', c => inCh(EVENTS, c)];
   if (view === 'ex' && dbState !== 'absent') return ['条摘录', c => inCh([...excerpts.values()], c)];
   if (view === 'link') return ['个事件', c => c === 'all' ? EVENTS.length : EVENTS.filter(e => e.place === PLACE_OF_CH[c]).length];
-  if (view === 'map') return ['条文献', c => curatedIn(c).length];
   return ['条文献', c => CURATED.filter(r => c === 'all' || r.r.ch.includes(c)).length];
 }
 function renderRail(){
@@ -705,7 +665,6 @@ function renderRail(){
 }
 function pickRegion(ch){
   region = ch; store.set('region', ch);
-  mapChapter = ch; store.set('mapChapter', ch); mapTier = 0; store.set('mapTier', 0);
   archCh = ch; store.set('archCh', ch);
   tCh = ch; store.set('tCh', ch); tPlace = 'all'; store.set('tPlace', 'all');
   exCh = ch; store.set('exCh', ch);
@@ -1011,8 +970,7 @@ function renderLink(){
   renderRail();
 }
 function applyChapter(c){
-  if (view === 'map') { mapChapter = c; store.set('mapChapter', c); }
-  else if (view === 'all' || view === 'reading') { F.rel = 'ch:' + c; store.set('filters2', F); shown = 60; syncFilters(); if (view === 'reading') view = 'all'; }
+  if (view === 'all' || view === 'reading') { F.rel = 'ch:' + c; store.set('filters2', F); shown = 60; syncFilters(); if (view === 'reading') view = 'all'; }
   else if (view === 'arch') { archCh = c; store.set('archCh', c); }
   else if (view === 'time') { tCh = c; store.set('tCh', c); }
   else if (view === 'ex') { exCh = c; store.set('exCh', c); }
@@ -1211,7 +1169,7 @@ function renderReading(){
   const section = (title, part) => { if (!part.length) return; any = true; part.sort((a,b) => ((b.r?b.r.lv:0) - (a.r?a.r.lv:0)) || ((a.y||9999) - (b.y||9999))); box.append(el('div', {class:'section-title'}, title, el('span', {class:'n', text: part.length + ' 条'}))); const l = el('div', {class:'list'}); part.forEach(r => l.append(card(r))); box.append(l); };
   ['在读','待读','已读','已引用'].forEach(g => section(g, [...reading.entries()].filter(([id, v]) => v.status === g && BY_ID.has(id)).map(([id]) => BY_ID.get(id))));
   section('只有笔记', [...reading.entries()].filter(([id, v]) => !v.status && (v.note||'').trim() && BY_ID.has(id)).map(([id]) => BY_ID.get(id)));
-  if (!any) box.append(el('div', {class:'empty', text:'还没有标记。在"研究区域"或"全部书目"里点"待读""在读""已读""已引用"，或写一条笔记，它们会出现在这里。'}));
+  if (!any) box.append(el('div', {class:'empty', text:'还没有标记。在"全部书目"里点"待读""在读""已读""已引用"，或写一条笔记，它们会出现在这里。'}));
   renderRail();
 }
 
@@ -1246,13 +1204,13 @@ async function save(filename, data){
 }
 
 /* ---------- views ---------- */
-const VIEWS = ['map','all','arch','time','link','ex','reading','about'];
-let view = 'map';
+const VIEWS = ['link','all','arch','time','ex','reading','about'];
+let view = 'link';
 function setView(v){
   view = v; store.set('view', v);
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.view === v)));
   VIEWS.forEach(k => { document.getElementById('view-' + k).hidden = k !== v; });
-  if (v === 'map') renderMap(); else if (v === 'all') renderAll(); else if (v === 'arch') renderArch(); else if (v === 'time') renderTime(); else if (v === 'link') renderLink(); else if (v === 'ex') renderEx(); else if (v === 'reading') renderReading();
+  if (v === 'all') renderAll(); else if (v === 'arch') renderArch(); else if (v === 'time') renderTime(); else if (v === 'link') renderLink(); else if (v === 'ex') renderEx(); else if (v === 'reading') renderReading();
   if (location.hash !== '#' + v) history.replaceState(null, '', '#' + v);
   const nav = document.querySelector('nav.tabs'), at = nav && nav.querySelector('.tab[aria-selected="true"]');
   if (at) { const l = at.offsetLeft, r = l + at.offsetWidth; if (l < nav.scrollLeft) nav.scrollLeft = l - 8; else if (r > nav.scrollLeft + nav.clientWidth) nav.scrollLeft = r - nav.clientWidth + 8; }
@@ -1290,7 +1248,8 @@ document.addEventListener('keydown', e => {
 });
 addEventListener('hashchange', () => { const h = (location.hash || '').replace('#', ''); if (VIEWS.includes(h) && h !== view) setView(h); });
 const fromHash = (location.hash || '').replace('#', '');
-setView(VIEWS.includes(fromHash) ? fromHash : store.get('view', 'map'));
+const storedView = store.get('view', 'link');
+setView(VIEWS.includes(fromHash) ? fromHash : (VIEWS.includes(storedView) ? storedView : 'link'));
 renderCounts();
 initCapabilities();
 })();
